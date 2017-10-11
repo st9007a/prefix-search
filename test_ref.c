@@ -39,7 +39,6 @@ int main(int argc, char **argv)
     t1 = tvgetf();
     while ((rtn = fscanf(fp, "%s", word)) != EOF) {
         char *p = strdup(word);
-        /* FIXME: insert reference to each string */
         if (!tst_ins_del(&root, &p, INS, REF)) {
             fprintf(stderr, "error: memory exhausted, tst_insert.\n");
             fclose(fp);
@@ -80,7 +79,6 @@ int main(int argc, char **argv)
             rmcrlf(word);
             p = strdup(word);
             t1 = tvgetf();
-            /* FIXME: insert reference to each string */
             res = tst_ins_del(&root, &p, INS, REF);
             t2 = tvgetf();
             if (res) {
@@ -132,7 +130,6 @@ int main(int argc, char **argv)
             p = strdup(word);
             printf("  deleting %s\n", word);
             t1 = tvgetf();
-            /* FIXME: remove reference to each string */
             res = tst_ins_del(&root, &p, DEL, REF);
             t2 = tvgetf();
             if (res)
