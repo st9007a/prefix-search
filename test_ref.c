@@ -7,7 +7,7 @@
 #include "bench.h"
 
 /** constants insert, delete, max word(s) & stack nodes */
-enum { INS, DEL, WRDMAX = 256, STKMAX = 512, LMAX = 1024 };
+enum { INS, DEL, WRDMAX = 256, STKMAX = 512, LMAX = 1024, DICTMAX = 300000 };
 #define REF INS
 #define CPY DEL
 
@@ -25,6 +25,7 @@ static void rmcrlf(char *s)
 int main(int argc, char **argv)
 {
     char word[WRDMAX] = "";
+    char (*cities_dict)[WRDMAX] = malloc(sizeof *cities_dict * DICTMAX);
     char *sgl[LMAX] = {NULL};
     tst_node *root = NULL, *res = NULL;
     int rtn = 0, idx = 0, sidx = 0;
@@ -33,12 +34,13 @@ int main(int argc, char **argv)
 
     if (!fp) { /* prompt, open, validate file for reading */
         fprintf(stderr, "error: file open failed '%s'.\n", argv[1]);
+        free(cities_dict);
         return 1;
     }
 
     t1 = tvgetf();
-    while ((rtn = fscanf(fp, "%s", word)) != EOF) {
-        char *p = strdup(word);
+    while ((rtn = fscanf(fp, "%s", cities_dict[idx])) != EOF) {
+        char *p = cities_dict[idx];
         if (!tst_ins_del(&root, &p, INS, REF)) {
             fprintf(stderr, "error: memory exhausted, tst_insert.\n");
             fclose(fp);
@@ -53,7 +55,7 @@ int main(int argc, char **argv)
 
     if (argc == 2 && strcmp(argv[1], "--bench") == 0) {
         int stat = bench_test(root, BENCH_TEST_FILE, LMAX);
-        tst_free_all(root);
+        tst_free(root);
         return stat;
     }
 
@@ -128,7 +130,7 @@ int main(int argc, char **argv)
                 break;
             }
             rmcrlf(word);
-            p = strdup(word);
+            p = word;
             printf("  deleting %s\n", word);
             t1 = tvgetf();
             res = tst_ins_del(&root, &p, DEL, REF);
