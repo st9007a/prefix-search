@@ -4,7 +4,7 @@ TESTS = \
 
 CFLAGS = -Wall -Werror -g
 
-# Control the build verbosity                                                   
+# Control the build verbosity
 ifeq ("$(VERBOSE)","1")
     Q :=
     VECHO = @true
@@ -24,12 +24,17 @@ $(GIT_HOOKS):
 	@echo
 
 OBJS_LIB = \
-    tst.o
+    tst.o \
+	bench.o
 
 OBJS := \
     $(OBJS_LIB) \
     test_cpy.o \
     test_ref.o
+
+BIN = \
+	test_cpy \
+	test_ref
 
 deps := $(OBJS:%.o=.%.o.d)
 
@@ -40,6 +45,11 @@ test_%: test_%.o $(OBJS_LIB)
 %.o: %.c
 	$(VECHO) "  CC\t$@\n"
 	$(Q)$(CC) -o $@ $(CFLAGS) -c -MMD -MF .$@.d $<
+
+bench: $(BIN)
+	@for test in $(BIN); do\
+		./$$test --bench; \
+	done
 
 clean:
 	$(RM) $(TESTS) $(OBJS)
