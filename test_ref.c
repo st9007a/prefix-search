@@ -77,7 +77,8 @@ int main(int argc, char **argv)
                 break;
             }
             rmcrlf(word);
-            p = strdup(word);
+            strcpy(cities_dict[idx], word);
+            p = cities_dict[idx];
             t1 = tvgetf();
             res = tst_ins_del(&root, &p, INS, REF);
             t2 = tvgetf();
@@ -140,7 +141,7 @@ int main(int argc, char **argv)
             }
             break;
         case 'q':
-            tst_free_all(root);
+            tst_free(root);
             return 0;
             break;
         default:
