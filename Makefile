@@ -51,6 +51,9 @@ bench: $(BIN)
 		./$$test --bench; \
 	done
 
+plot:
+	@gnuplot scripts/runtime.gp
+
 clean:
 	$(RM) $(TESTS) $(OBJS)
 	$(RM) $(deps)
