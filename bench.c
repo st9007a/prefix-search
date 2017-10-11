@@ -24,7 +24,6 @@ int bench_test(const tst_node *root, char *out_file, const int max)
 {
     char prefix[3];
     char **sgl;
-    tst_node *res = NULL;
     FILE *fp = fopen(out_file, "w");
     int idx = 0, sidx = 0;
     double t1, t2;
@@ -42,13 +41,10 @@ int bench_test(const tst_node *root, char *out_file, const int max)
             for (int k = 0; k < 26; k++) {
                 prefix[2] = lower_case_alphabet[k];
                 t1 = tvgetf();
-                res = tst_search_prefix(root, prefix, sgl, &sidx, max);
+                tst_search_prefix(root, prefix, sgl, &sidx, max);
                 t2 = tvgetf();
-                if (res) {
-                    idx++;
-                    /* printf(" %s - searched prefix in %.6f sec\n", prefix, t2 - t1); */
-                    fprintf(fp, "%d %.6f sec\n", idx, t2 - t1);
-                }
+                fprintf(fp, "%d %.6f sec\n", idx, t2 - t1);
+                idx++;
             }
         }
     }
