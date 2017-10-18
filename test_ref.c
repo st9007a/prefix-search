@@ -41,7 +41,7 @@ int main(int argc, char **argv)
     pool = new_mem_pool(10000000);
     if (pool == NULL) {
         printf("error: fail to initial memory pool.\n");
-        free(fp);
+        fclose(fp);
         return 1;
     }
 
