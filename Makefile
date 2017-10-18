@@ -25,7 +25,8 @@ $(GIT_HOOKS):
 
 OBJS_LIB = \
     tst.o \
-	bench.o
+	bench.o \
+	mempool.o
 
 OBJS := \
     $(OBJS_LIB) \

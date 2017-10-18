@@ -5,9 +5,10 @@
 
 #include "tst.h"
 #include "bench.h"
+#include "mempool.h"
 
 /** constants insert, delete, max word(s) & stack nodes */
-enum { INS, DEL, WRDMAX = 256, STKMAX = 512, LMAX = 1024, DICTMAX = 300000 };
+enum { INS, DEL, WRDMAX = 64, STKMAX = 512, LMAX = 1024, DICTMAX = 300000 };
 #define REF INS
 #define CPY DEL
 
@@ -25,7 +26,7 @@ static void rmcrlf(char *s)
 int main(int argc, char **argv)
 {
     char word[WRDMAX] = "";
-    char (*cities_dict)[WRDMAX] = malloc(sizeof *cities_dict * DICTMAX);
+    MemPool *pool;
     char *sgl[LMAX] = {NULL};
     tst_node *root = NULL, *res = NULL;
     int rtn = 0, idx = 0, sidx = 0;
@@ -34,19 +35,27 @@ int main(int argc, char **argv)
 
     if (!fp) { /* prompt, open, validate file for reading */
         fprintf(stderr, "error: file open failed '%s'.\n", argv[1]);
-        free(cities_dict);
+        return 1;
+    }
+
+    pool = new_mem_pool(10000000);
+    if (pool == NULL) {
+        printf("error: fail to initial memory pool.\n");
+        free(fp);
         return 1;
     }
 
     t1 = tvgetf();
-    while ((rtn = fscanf(fp, "%s", cities_dict[idx])) != EOF) {
-        char *p = cities_dict[idx];
+    while ((rtn = fscanf(fp, "%s", get_pool_curr(pool))) != EOF) {
+        char *p = get_pool_curr(pool);
         if (!tst_ins_del(&root, &p, INS, REF)) {
             fprintf(stderr, "error: memory exhausted, tst_insert.\n");
             fclose(fp);
             return 1;
         }
         idx++;
+
+        mv_pool_curr(strlen(p) + 1, pool);
     }
     t2 = tvgetf();
 
@@ -56,6 +65,7 @@ int main(int argc, char **argv)
     if (argc == 2 && strcmp(argv[1], "--bench") == 0) {
         int stat = bench_test(root, BENCH_TEST_FILE, LMAX);
         tst_free(root);
+        free(pool);
         return stat;
     }
 
@@ -79,8 +89,8 @@ int main(int argc, char **argv)
                 break;
             }
             rmcrlf(word);
-            strcpy(cities_dict[idx], word);
-            p = cities_dict[idx];
+            p = poalloc(strlen(word) + 1, pool);
+            strcpy(p, word);
             t1 = tvgetf();
             res = tst_ins_del(&root, &p, INS, REF);
             t2 = tvgetf();

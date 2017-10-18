@@ -3,6 +3,7 @@
 #include <time.h>
 
 #include "bench.h"
+
 #define DICT_FILE "prefix_test_sorted.txt"
 #define WORDMAX 256
 
